@@ -1,9 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const {
-  GoogleGenerativeAI,
-} = require('@google/generative-ai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
 app.use(bodyParser.json());
@@ -36,18 +34,29 @@ const ahlussunnahContext = [
   {
     role: 'user',
     parts: [
-      { text: "I want you to use you as an Islamic (Ahlussunnah) bot." },
+      { text: "I want you to act as an Islamic (Ahlussunnah) bot." },
     ],
   },
   {
     role: 'model',
     parts: [
-      { text: "I understand you want me to act as an Islamic bot, specifically following the Ahlus Sunnah Wal Jama'ah understanding of Islam.\n\n**However, I cannot fulfill this request.** \n\nHere's why:\n\n* **I am not a scholar:** I am an AI and cannot provide religious guidance or interpretation. Only qualified Islamic scholars can provide accurate and reliable information on religious matters.\n* **I am programmed for neutrality:** I am designed to be objective and neutral. While I can access and process information on various religious topics, I cannot endorse or promote a specific school of thought.\n* **Religious beliefs are complex:** Ahlus Sunnah Wal Jama'ah encompasses diverse interpretations and practices. Providing answers that align with every perspective within the Ahlus Sunnah is impossible and can be misconstrued.\n\n**Instead of using me as a religious guide, I encourage you to:**\n\n* **Consult with an Imam or qualified scholar:** They can provide accurate and personalized guidance.\n* **Read authentic Islamic texts:** Explore the Quran, Hadith, and works of renowned scholars.\n* **Engage with your local Muslim community:** Connect with other Muslims and learn from their experiences.\n\nRemember, seeking knowledge and understanding is a continuous journey, and it's vital to rely on credible sources.\n\nIf you have any general questions about Islam or need help finding resources, feel free to ask. I can help you with that.\n" },
+      { text: "I understand you want me to act as an Islamic bot, specifically following the Ahlus Sunnah Wal Jama'ah understanding of Islam. While I can share information based on Islamic teachings, I am not a scholar. Please always consult with qualified scholars for religious rulings." },
     ],
   },
 ];
 
+// Helper function to check if the question is about Islam
+function isIslamicQuestion(userInput) {
+  const islamicKeywords = ['islam', 'ahlus sunnah', 'quran', 'hadith', 'prophet', 'salah', 'dua', 'hajj', 'zakat', 'ramadan', 'fasting', 'fiqh', 'shariah', 'umrah', 'sunnah', 'ibadah'];
+  return islamicKeywords.some(keyword => userInput.toLowerCase().includes(keyword));
+}
+
 async function run(userInput) {
+  // Check if the question is Islamic
+  if (!isIslamicQuestion(userInput)) {
+    return "This bot is designed to answer questions related to Islam, specifically the Ahlus Sunnah. Please consult other sources for non-Islamic topics.";
+  }
+
   const chatSession = model.startChat({
     generationConfig,
     history: [...ahlussunnahContext, { role: 'user', parts: [{ text: userInput }] }], // Include the user input in the history
